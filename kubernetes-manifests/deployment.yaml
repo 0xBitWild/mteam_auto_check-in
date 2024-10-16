@@ -3,23 +3,23 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    k8s-app: mteam_auto_check-in
-  name: mteam_auto_check-in
+    k8s-app: mteam-auto-check-in
+  name: mteam-auto-check-in
 spec:
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      k8s-app: mteam_auto_check-in
+      k8s-app: mteam-auto-check-in
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        k8s-app: mteam_auto_check-in
+        k8s-app: mteam-auto-check-in
     spec:
       containers:
-      - name: mteam_auto_check-in
+      - name: mteam-auto-check-in
         image: bitwild/mteam_auto_check-in:latest
         imagePullPolicy: IfNotPresent
         env:
@@ -48,8 +48,24 @@ spec:
         - name: NOTIFY_EMAIL
           value: your_notify_email
         command: ["sh", "-c", "python mteam_auto_check-in.py"]
-        healthcheck:
-          test: [ "CMD", "pgrep", "-f", "python mteam_auto_check-in.py" ]
-          interval: 30s
-          timeout: 10s
-          retries: 3
+        livenessProbe:
+          exec:
+            command:
+            - pgrep
+            - -f
+            - "python mteam_auto_check-in.py"
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - pgrep
+            - -f
+            - "python mteam_auto_check-in.py"
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+
