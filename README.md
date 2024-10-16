@@ -52,7 +52,10 @@ docker compose up -d
 
 ```bash
 
-# 修改deployment.dev.yml中的环境变量
+# 进入kubernetes-manifests目录
+cd kubernetes-manifests
+
+# 修改deployment.yml中的环境变量
 vi deployment.yml
 
 # 启动
