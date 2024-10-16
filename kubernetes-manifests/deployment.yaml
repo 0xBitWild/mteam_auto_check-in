@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: mteam_auto_check-in
+  name: mteam_auto_check-in
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: mteam_auto_check-in
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        k8s-app: mteam_auto_check-in
+    spec:
+      containers:
+      - name: mteam_auto_check-in
+        image: bitwild/mteam_auto_check-in:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: TZ
+          value: Asia/Shanghai
+        - name: MTEAM_USERNAME
+          value: your_mteam_username
+        - name: MTEAM_PASSWORD
+          value: your_mteam_password
+        - name: MTEAM_TOTP_SECRET
+          value: your_mteam_totp_secret
+        - name: SMTP_HOST
+          value: your_smtp_host
+        - name: SMTP_PORT
+          value: "465"
+        - name: SMTP_USERNAME
+          value: your_smtp_username
+        - name: SMTP_PASSWORD
+          value: your_smtp_password
+        - name: TELEGRAM_BOT_TOKEN
+          value: your_telegram_bot_token
+        - name: TELEGRAM_CHAT_ID
+          value: your_telegram_chat_id
+        - name: NOTIFY_TYPE
+          value: smtp
+        - name: NOTIFY_EMAIL
+          value: your_notify_email
+        command: ["sh", "-c", "python mteam_auto_check-in.py"]
+        healthcheck:
+          test: [ "CMD", "pgrep", "-f", "python mteam_auto_check-in.py" ]
+          interval: 30s
+          timeout: 10s
+          retries: 3
