@@ -166,6 +166,8 @@ class MTeamSpider:
         self.password = os.environ.get('MTEAM_PASSWORD')
         self.totp_secret = os.environ.get('MTEAM_TOTP_SECRET')
 
+        self.notify_subject = 'M-Team签到脚本通知'
+
         if not all([self.username, self.password, self.totp_secret]):
             raise ValueError("请设置所有必要的环境变量：MTEAM_USERNAME, MTEAM_PASSWORD, MTEAM_TOTP_SECRET")
 
@@ -189,7 +191,7 @@ class MTeamSpider:
                 os.environ.get('SMTP_PASSWORD')
             )
 
-            self.notifier.send_notification('SMTP配置成功', subject='M-Team 签到脚本通知')
+            self.notifier.send_notification('SMTP配置成功', subject=self.notify_subject)
 
         elif notify_type == 'telegram':
 
@@ -201,7 +203,7 @@ class MTeamSpider:
                 os.environ.get('TELEGRAM_CHAT_ID')
             )
 
-            self.notifier.send_notification('Telegram配置成功', subject='M-Team 签到脚本通知')
+            self.notifier.send_notification('Telegram配置成功', subject=self.notify_subject)
 
         elif notify_type == 'none':
             self.notifier = None
@@ -244,7 +246,7 @@ class MTeamSpider:
                 local_storage_manager.save_to_file(str(self.localstorage_file))
                 logger.info('已保存更新localstorage到文件')
 
-                self.notifier.send_notification('通过 localStorage 登录 M-Team 成功', subject='M-Team 签到脚本通知')
+                self.notifier.send_notification('通过 localStorage 登录 M-Team 成功', subject=self.notify_subject)
             else:
                 logger.warning('通过 localStorage 登录 M-Team 失败')
                 raise LocalStorageLoginError('通过 localStorage 登录 M-Team 失败')
@@ -300,7 +302,7 @@ class MTeamSpider:
                 local_storage_manager.save_to_file(str(self.localstorage_file))
                 logger.info('已保存localstorage到文件')
 
-                self.notifier.send_notification('通过用户名密码登录M-Team成功', subject='M-Team 签到脚本通知')
+                self.notifier.send_notification('通过用户名密码登录M-Team成功', subject=self.notify_subject)
 
             else:
                 logger.error('通过用户名密码登录M-Team失败')
@@ -310,7 +312,7 @@ class MTeamSpider:
         except Exception as e:
             logger.error('通过用户名密码登录时发生错误: %s', str(e))
 
-            self.notifier.send_notification(f'通过用户名密码登录时发生错误: {str(e)}', subject='M-Team 签到脚本通知')
+            self.notifier.send_notification(f'通过用户名密码登录时发生错误: {str(e)}', subject=self.notify_subject)
 
             raise PasswordLoginError(str(e)) from e
 
@@ -319,8 +321,8 @@ class MTeamSpider:
 
         logger.info("开始执行签到流程")
 
-        # 随机等待10到30000秒
-        random_delay = random.randint(10, 30000)
+        # 随机等待10到300秒
+        random_delay = random.randint(10, 300)
         logger.info("等待 %s 秒后开始签到", random_delay)
         time.sleep(random_delay)
 
